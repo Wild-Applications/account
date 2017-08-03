@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: account
+  labels:
+   name: account
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: deployment
+  namespace: account
+  labels:
+    app: account
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: account
+    spec:
+      containers:
+      - name: account
+        image: blueapp/account:0.0.2
+        ports:
+        - containerPort: 50051
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service
+  namespace: account
+  labels:
+    app: account
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1295
+    targetPort: 50051
+  selector:
+    app: account
+  externalName: account
