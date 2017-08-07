@@ -2,17 +2,20 @@
 
 //Imports
 const grpc = require('grpc');
-const authenticationHelper = require('./helpers/account.helper.js');
+const accountHelper = require('./helpers/account.helper.js');
 const proto = grpc.load(__dirname + '/proto/account.proto');
 const server = new grpc.Server();
 
 //define the callable methods that correspond to the methods defined in the protofile
 server.addService(proto.account.AccountService.service, {
   get: function(call, callback){
-    callback(null, {_id:1});
+    accountHelper.getAccount();
   },
   create: function(call, callback){
-    callback(null,{_id:1});
+    accountHelper.createAccount();
+  },
+  authenticate: function(call, callback){
+    accountHelper.authenticate(call,callback);
   }
 
 });

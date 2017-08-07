@@ -6,6 +6,7 @@ package account;
 service AccountService {
   rpc get (GetRequest) returns (GetReply){}
   rpc create (CreateRequest) returns (CreateReply){}
+  rpc authenticate (AuthenticateRequest) returns (IdReply){}
 }
 
 // Message Type definition for user
@@ -26,4 +27,13 @@ message CreateRequest {
 
 message CreateReply {
   string _id = 1;
+}
+
+message AuthenticateRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message IdReply {
+  int32 _id = 1;
 }
