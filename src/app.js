@@ -9,10 +9,10 @@ const server = new grpc.Server();
 //define the callable methods that correspond to the methods defined in the protofile
 server.addService(proto.account.AccountService.service, {
   get: function(call, callback){
-    accountHelper.getAccount();
+    accountHelper.getAccount(call, callback);
   },
   create: function(call, callback){
-    accountHelper.createAccount();
+    accountHelper.create(call,callback);
   },
   authenticate: function(call, callback){
     accountHelper.authenticate(call,callback);

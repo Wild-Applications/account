@@ -5,6 +5,15 @@ metadata:
   labels:
    name: account
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-secret
+  namespace: account
+type: Opaque
+stringData:
+  secret: KO/9ASG/XcOq0QEpxE2/VwDlCYVkBt4Si0ILMb4UYXzm9l+KZ0aJdGf0LZ0OtvPp41KrMuASJmI5mo6XUbkX1FmswAqQRdOvzv1vgugN4kiTPK/zUgRwn8ZZj0qiDG4skP52DyeYJw/bEJQi4NBP2sLxQAJnSjnErVsaQ4a7a8QywidUmzWcEAg3exMPnsyqticoPh/9VQCJZ4W0fS3Lxs7VcmYRb8rsc9Hm84iaoDU4pqDofpNaOUEBQ3DYZA9DZED8eHtmiH6e9LZn9UV59A9SoABXVtpMrjzKLUqgK/11lDcB+ahjY7XVg6zUERalfj095LBVMaH4gycH2MMgEg==
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -24,6 +33,12 @@ spec:
         image: blueapp/account:0.0.2
         ports:
         - containerPort: 50051
+        env:
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: secret
 ---
 apiVersion: v1
 kind: Service

@@ -5,6 +5,7 @@ package authentication;
 //Methods exposed to client
 service AuthenticationService {
   rpc authenticateUser (AuthenticationRequest) returns (AuthenticationReply){}
+  rpc storeUser (AuthenticationRequest) returns (StorageReply){}
 }
 
 // Message Type definition for user
@@ -15,4 +16,8 @@ message AuthenticationRequest {
 
 message AuthenticationReply {
   bool authenticated = 1;
+}
+
+message StorageReply {
+  bool stored = 1;
 }
