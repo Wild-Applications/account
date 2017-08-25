@@ -99,7 +99,16 @@ account.create = function(call, callback){
             });
           }else{
             console.log(results);
-            storePassword(results.insertId, call.request.password, connection, callback);
+            storePassword(results.insertId, call.request.password, connection, function(err, passwordResult){
+              if(err){
+                return callback(err, null);
+              }else{
+                createPremises(results.insertId, function(err, premisesId){
+                  callback(null, result);
+                })
+              }
+            });
+
           }
       });
     });
@@ -165,6 +174,26 @@ function storePassword(_id, password, connection, callback){
   }
 }
 
+function createPremises(_id, callback){
+  var grpc = require("grpc");
+  var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
+  var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
+
+  if(_id){
+    var body = {};
+    body.name = "";
+    body.description = "";
+    body.owner = _id;
+    premisesClient.create(body, function(err, result){
+      if(err){
+        return callback({message:'unable to create premises'});
+      }else{
+        return callback(null, result);
+      }
+    });
+  }
+}
+
 
 
 
@@ -176,7 +205,7 @@ function generateToken(_id){
     sub: _id,
     jti: 1,
     iat: Math.floor(Date.now() / 1000) - 30
-  },process.env.JWT_SECRET, {expiresIn: 60 * 60 * 18});
+  },process.env.JWT_SECRET, {expiresIn: 60 * 60 * 12});
 }
 
 module.exports = account;
