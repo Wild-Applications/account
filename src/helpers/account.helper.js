@@ -28,21 +28,20 @@ account.getAccount = function(call, callback){
     }
     pool.getConnection(function(err, connection){
       if(err){
-        return callback({message:'0001,Failed to connect to database'}, null);
+        return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
       }
       var query = "SELECT username, email FROM users where _id = " + token.sub + " LIMIT 1";
       connection.query(query, function(error, results){
         connection.release();
-        if(err){return callback({message:"0002,Failed to run query against database"}, null)}
+        if(err){return callback({message:JSON.stringify({code:'0002', message:'Failed to run query against database'})}, null);}
         if(typeof results != 'undefined'){
           if(results.length != 0){
             callback(null, results[0]);
           }else{
-            //TODO: handle errors
-            callback(null, null);
+            return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
           }
         }else{
-          callback(null, null);
+          return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
         }
       });
     });
@@ -57,23 +56,22 @@ account.authenticate = function(call, callback){
   // token = tokenService.generateToken();
   pool.getConnection(function(err, connection) {
     if (err) {
-      callback({message:'0001 - Failed to connect to the database'},null);
-      return;
+      return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
     }
     var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "' OR email = '" + call.request.username + "'";
     connection.query(query, function(error, results){
       connection.release();
-      if(err){callback({message:'0002 - Failed to run query against the database'},null);return;}
+      if(err){return callback({message:JSON.stringify({code:'0002', message:'Username or password did not match'})}, null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
           var result = verifyPassword(results[0]._id, call.request.password, callback);
         }else{
           //no results
-          callback({message:'0005 - Username or Password did not match'},null);
+          return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
         }
       }else{
-        callback({message:'0005 - Username or Password did not match'},null);
+        return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
       }
     });
   });
@@ -82,20 +80,18 @@ account.authenticate = function(call, callback){
 account.create = function(call, callback){
   pool.getConnection(function(err,connection){
     if(err){
-      callback({message:'0001 - Failed to connect to the database'}, null);
-      return;
+      return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
     }
     connection.beginTransaction(function(err){
       if(err){
-        callback({message:'0001 - Failed to connect to the database'}, null);
-        return;
+        return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
       }
       var query = "INSERT INTO users (username, email) VALUES ('"+call.request.username+"', '"+call.request.email+"')";
       console.log(query);
       connection.query(query, function(error, results){
           if(error){
             connection.rollback(function(){
-              callback({message:'0004 Unable to create new user'}, null);
+              return callback({message:JSON.stringify({code:'0004', message:'Unable to create new user'})}, null);
             });
           }else{
             console.log(results);
@@ -128,17 +124,17 @@ function verifyPassword(_id, password, callback){
     body._id = _id;
     body.password = password;
     authenticationClient.authenticateUser(body, function(err,response){
-      if(err){ return callback({message:'0010 - Comparison of passwords failed'},null);};
+      if(err){ return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);};
       //
       if(response.authenticated){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
       }else{
-        callback({message:'0005 - Username or Password did not match'},null);
+        return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
       }
     });
   }else{
-    callback({message:"0011 - Account Id or Password were not supplied"},null);
+    return callback({message:JSON.stringify({code:'0011', message:'Username and password were not supplied'})}, null);
   }
 }
 
