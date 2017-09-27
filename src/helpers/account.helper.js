@@ -38,10 +38,10 @@ account.getAccount = function(call, callback){
           if(results.length != 0){
             callback(null, results[0]);
           }else{
-            return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
+            return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match', status: 401})}, null);
           }
         }else{
-          return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
+          return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match', status: 401})}, null);
         }
       });
     });
@@ -61,17 +61,17 @@ account.authenticate = function(call, callback){
     var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "' OR email = '" + call.request.username + "'";
     connection.query(query, function(error, results){
       connection.release();
-      if(err){return callback({message:JSON.stringify({code:'0002', message:'Username or password did not match'})}, null);}
+      if(err){return callback({message:JSON.stringify({code:'0002', message:'1Username or password did not match'})}, null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
           var result = verifyPassword(results[0]._id, call.request.password, callback);
         }else{
           //no results
-          return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
+          return callback({message:JSON.stringify({code:'0005', message:'2Username or password did not match'})}, null);
         }
       }else{
-        return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
+        return callback({message:JSON.stringify({code:'0005', message:'3Username or password did not match'})}, null);
       }
     });
   });
@@ -90,27 +90,35 @@ account.create = function(call, callback){
       console.log(query);
       connection.query(query, function(error, results){
           if(error){
+            console.log(error.sqlMessage);
             connection.rollback(function(){
-              return callback({message:JSON.stringify({code:'0004', message:'Unable to create new user'})}, null);
-            });
+              callback({message:JSON.stringify({code:'0014', message:'User already exists'})}, null);
+            })
           }else{
             console.log(results);
             storePassword(results.insertId, call.request.password, connection, function(err, passwordResult){
               if(err){
-                return callback(err, null);
+                return connection.rollback(function(){
+                  callback({message:JSON.stringify({code:'0004', message:'2Unable to create new user'})}, null);
+                });
               }else{
-                createPremises(results.insertId, function(err, premisesId){
-                  callback(null, result);
+                connection.commit(function(err){
+                  if(err){
+                    connection.rollback(function(){
+                      return callback({message:JSON.stringify({code:'0004', message:'4Unable to create new user'})}, null);
+                    })
+                  }else{
+                    callback(null, {token: generateToken(passwordResult._id)});
+                  }
                 })
+
               }
             });
-
           }
       });
     });
   });
 }
-
 
 
 function verifyPassword(_id, password, callback){
@@ -124,17 +132,17 @@ function verifyPassword(_id, password, callback){
     body._id = _id;
     body.password = password;
     authenticationClient.authenticateUser(body, function(err,response){
-      if(err){ return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);};
+      if(err){ return callback(err, null);};
       //
       if(response.authenticated){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
       }else{
-        return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match'})}, null);
+        return callback({message:JSON.stringify({code:'0005', message:'BUsername or password did not match'})}, null);
       }
     });
   }else{
-    return callback({message:JSON.stringify({code:'0011', message:'Username and password were not supplied'})}, null);
+    return callback({message:JSON.stringify({code:'0011', message:'CUsername and password were not supplied'})}, null);
   }
 }
 

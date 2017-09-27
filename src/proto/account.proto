@@ -25,7 +25,7 @@ message CreateRequest {
 }
 
 message CreateReply {
-  int32 _id = 1;
+  string token = 1;
 }
 
 message AuthenticateRequest {
