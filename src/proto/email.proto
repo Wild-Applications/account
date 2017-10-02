@@ -15,5 +15,5 @@ message EmailRequest {
 }
 
 message EmailReply {
-  boolean result = 1;
+  bool result = 1;
 }

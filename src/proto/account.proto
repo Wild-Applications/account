@@ -43,5 +43,5 @@ message RecoverRequest {
 }
 
 message RecoverReply {
-  boolean result = 1;
+  bool result = 1;
 }
