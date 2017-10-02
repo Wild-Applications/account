@@ -22,8 +22,8 @@ var authenticationClient = new authenticationDescriptor.AuthenticationService('s
 var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
 var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
 
-emailDescriptor = grpc.load(__dirname + '/../proto/email.proto').email;
-emailClient = new emailDescriptor.EmailService('service.email:1295', grpc.credentials.createInsecure());
+var emailDescriptor = grpc.load(__dirname + '/../proto/email.proto').email;
+var emailClient = new emailDescriptor.EmailService('service.email:1295', grpc.credentials.createInsecure());
 
 //var jwt = require('jsonwebtoken');
 //var tokenService = require('bleuapp-token-service').createTokenHandler('service.token', '50051');
@@ -111,10 +111,12 @@ account.recover = function(call, callback){
           });
         }else{
           //no results
-          return callback({message:JSON.stringify({code:'0005', message:'Something went wrong.'})}, null);
+          //in this case we dont want the user to know if an account with that username/email exists
+          //so we return true anyway
+          return callback(null,{response: true});
         }
       }else{
-        return callback({message:JSON.stringify({code:'0005', message:'Something went wrong.'})}, null);
+        return callback(null,{response: true});
       }
     });
   });
