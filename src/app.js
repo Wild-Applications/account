@@ -14,11 +14,11 @@ server.addService(proto.account.AccountService.service, {
   create: function(call, callback){
     accountHelper.create(call,callback);
   },
-  createVerifyAnon: function(call, callback){
-    accountHelper.verifyOrCreateAnon(call, callback);
-  },
   authenticate: function(call, callback){
     accountHelper.authenticate(call,callback);
+  },
+  recover: function(call, callback){
+    accountHelper.recover(call, callback);
   }
 
 });

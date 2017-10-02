@@ -15,6 +15,16 @@ var pool = mysql.createPool({
   database        : 'usrdb'
 });
 
+var grpc = require("grpc");
+var authenticationDescriptor = grpc.load(__dirname + '/../proto/authentication.proto').authentication;
+var authenticationClient = new authenticationDescriptor.AuthenticationService('service.authentication:1295', grpc.credentials.createInsecure());
+
+var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
+var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
+
+emailDescriptor = grpc.load(__dirname + '/../proto/email.proto').email;
+emailClient = new emailDescriptor.EmailService('service.email:1295', grpc.credentials.createInsecure());
+
 //var jwt = require('jsonwebtoken');
 //var tokenService = require('bleuapp-token-service').createTokenHandler('service.token', '50051');
 
@@ -77,6 +87,39 @@ account.authenticate = function(call, callback){
   });
 }
 
+account.recover = function(call, callback){
+  pool.getConnection(function(err, connection) {
+    if (err) {
+      return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
+    }
+    var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "' OR email = '" + call.request.username + "'";
+    connection.query(query, function(error, results){
+      connection.release();
+      if(err){return callback({message:JSON.stringify({code:'0002', message:'1Username or password did not match'})}, null);}
+      if(typeof results != 'undefined'){
+        if(results.length != 0){
+          //user exists so verify password matches
+          //var result = verifyPassword(results[0]._id, call.request.password, callback);
+          //generate temporary token that links to user account
+          //send email containing user account
+          
+          emailClient.send({recipient: 'michael@wildapplications.com', subject:'Test', content:'This is a test email sent from the server'}, function(err, response){
+            if(err){
+              callback(err, null);
+            }
+            return callback(null, response);
+          });
+        }else{
+          //no results
+          return callback({message:JSON.stringify({code:'0005', message:'2Username or password did not match'})}, null);
+        }
+      }else{
+        return callback({message:JSON.stringify({code:'0005', message:'3Username or password did not match'})}, null);
+      }
+    });
+  });
+}
+
 account.create = function(call, callback){
   pool.getConnection(function(err,connection){
     if(err){
@@ -122,9 +165,6 @@ account.create = function(call, callback){
 
 
 function verifyPassword(_id, password, callback){
-  var grpc = require("grpc");
-  var authenticationDescriptor = grpc.load(__dirname + '/../proto/authentication.proto').authentication;
-  var authenticationClient = new authenticationDescriptor.AuthenticationService('service.authentication:1295', grpc.credentials.createInsecure());
 
   if( _id && password ){
     //call the authentication service
@@ -147,9 +187,6 @@ function verifyPassword(_id, password, callback){
 }
 
 function storePassword(_id, password, connection, callback){
-  var grpc = require("grpc");
-  var authenticationDescriptor = grpc.load(__dirname + '/../proto/authentication.proto').authentication;
-  var authenticationClient = new authenticationDescriptor.AuthenticationService('service.authentication:1295', grpc.credentials.createInsecure());
 
   if(_id && password ){
     var body = {};
@@ -179,9 +216,7 @@ function storePassword(_id, password, connection, callback){
 }
 
 function createPremises(_id, callback){
-  var grpc = require("grpc");
-  var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
-  var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
+
 
   if(_id){
     var body = {};
