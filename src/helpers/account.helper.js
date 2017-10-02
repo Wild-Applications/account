@@ -92,7 +92,7 @@ account.recover = function(call, callback){
     if (err) {
       return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
     }
-    var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "' OR email = '" + call.request.username + "'";
+    var query = "SELECT _id FROM users WHERE username = '" + call.request.email + "' OR email = '" + call.request.email + "'";
     connection.query(query, function(error, results){
       connection.release();
       if(err){return callback({message:JSON.stringify({code:'0002', message:'1Username or password did not match'})}, null);}
@@ -102,7 +102,7 @@ account.recover = function(call, callback){
           //var result = verifyPassword(results[0]._id, call.request.password, callback);
           //generate temporary token that links to user account
           //send email containing user account
-          
+
           emailClient.send({recipient: 'michael@wildapplications.com', subject:'Test', content:'This is a test email sent from the server'}, function(err, response){
             if(err){
               callback(err, null);
@@ -111,10 +111,10 @@ account.recover = function(call, callback){
           });
         }else{
           //no results
-          return callback({message:JSON.stringify({code:'0005', message:'2Username or password did not match'})}, null);
+          return callback({message:JSON.stringify({code:'0005', message:'Something went wrong.'})}, null);
         }
       }else{
-        return callback({message:JSON.stringify({code:'0005', message:'3Username or password did not match'})}, null);
+        return callback({message:JSON.stringify({code:'0005', message:'Something went wrong.'})}, null);
       }
     });
   });
