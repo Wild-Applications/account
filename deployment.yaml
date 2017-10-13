@@ -31,7 +31,7 @@ spec:
       containers:
       - name: account
         image: wildapplications/account:latest
-        imagePullPolicy: "Always"
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 50051
         env:
@@ -40,6 +40,12 @@ spec:
             secretKeyRef:
               name: jwt-secret
               key: secret
+        volumeMounts:
+        - name: redis-persistent-storage
+          mountPath: /data/redis
+      volumes:
+      - name: redis-persistent-storage
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

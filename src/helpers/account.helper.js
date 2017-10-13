@@ -101,14 +101,19 @@ account.recover = function(call, callback){
           //user exists so verify password matches
           //var result = verifyPassword(results[0]._id, call.request.password, callback);
           //generate temporary token that links to user account
-          //send email containing user account
+          //send email containing unique string
 
-          emailClient.send({recipient: 'michael@wildapplications.com', subject:'Test', content:'This is a test email sent from the server'}, function(err, response){
+
+
+
+          /*emailClient.send({recipient: 'michael@wildapplications.com', subject:'Test', content:'This is a test email sent from the server'}, function(err, response){
             if(err){
               callback(err, null);
             }
+            console.log(response);
             return callback(null, response);
-          });
+          });*/
+          callback({message:'testing storage'}, null);
         }else{
           //no results
           //in this case we dont want the user to know if an account with that username/email exists
@@ -120,6 +125,13 @@ account.recover = function(call, callback){
       }
     });
   });
+}
+
+account.resetPassword = function(call, callback){
+  //call.verification
+  //call.password
+  //find the associated verification and user id
+  
 }
 
 account.create = function(call, callback){
