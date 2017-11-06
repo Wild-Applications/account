@@ -3,7 +3,8 @@
 
 //imports
 var mysql      = require('mysql'),
-jwt            = require('jsonwebtoken');
+jwt            = require('jsonwebtoken'),
+errors         = require('../errors/errors.json');
 
 //database config
 var pool = mysql.createPool({
@@ -25,8 +26,6 @@ var premisesClient = new premisesDescriptor.PremisesService('service.premises:12
 var emailDescriptor = grpc.load(__dirname + '/../proto/email.proto').email;
 var emailClient = new emailDescriptor.EmailService('service.email:1295', grpc.credentials.createInsecure());
 
-//var jwt = require('jsonwebtoken');
-//var tokenService = require('bleuapp-token-service').createTokenHandler('service.token', '50051');
 
 var account = {};
 
@@ -38,20 +37,20 @@ account.getAccount = function(call, callback){
     }
     pool.getConnection(function(err, connection){
       if(err){
-        return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
+        return callback({message:JSON.stringify({code:'01000001', error:errors['0001']})}, null);
       }
       var query = "SELECT username, email FROM users where _id = " + token.sub + " LIMIT 1";
       connection.query(query, function(error, results){
         connection.release();
-        if(err){return callback({message:JSON.stringify({code:'0002', message:'Failed to run query against database'})}, null);}
+        if(err){return callback({message:JSON.stringify({code:'01000002', error:errors['0002']})}, null);}
         if(typeof results != 'undefined'){
           if(results.length != 0){
             callback(null, results[0]);
           }else{
-            return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match', status: 401})}, null);
+            return callback({message:JSON.stringify({code:'01000003', error:errors['0003']})}, null);
           }
         }else{
-          return callback({message:JSON.stringify({code:'0005', message:'Username or password did not match', status: 401})}, null);
+          return callback({message:JSON.stringify({code:'01010003', error:errors['0003']})}, null);
         }
       });
     });
@@ -59,29 +58,30 @@ account.getAccount = function(call, callback){
 }
 
 account.authenticate = function(call, callback){
-  // var token = jwt.sign({
-  //   auth: 'magic',
-  //   id: '0'
-  // },'michaelwildchangethisplease');
-  // token = tokenService.generateToken();
   pool.getConnection(function(err, connection) {
     if (err) {
-      return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
+      return callback({message:JSON.stringify({code:'01010001', error:errors['0001']})}, null);
     }
-    var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "' OR email = '" + call.request.username + "'";
+    if(!call.request.client){
+      call.request.client = false;
+    }
+    if(!call.request.customer){
+      call.request.customer = false;
+    }
+    var query = "SELECT _id FROM users WHERE (username = '" + call.request.username + "' OR email = '" + call.request.username + "') AND client = " + call.request.client + " AND customer = " + call.request.customer;
     connection.query(query, function(error, results){
       connection.release();
-      if(err){return callback({message:JSON.stringify({code:'0002', message:'1Username or password did not match'})}, null);}
+      if(err){return callback({message:JSON.stringify({code:'01000004', error:errors['0004']})}, null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
           var result = verifyPassword(results[0]._id, call.request.password, callback);
         }else{
           //no results
-          return callback({message:JSON.stringify({code:'0005', message:'2Username or password did not match'})}, null);
+          return callback({message:JSON.stringify({code:'01010004', error:errors['0004']})}, null);
         }
       }else{
-        return callback({message:JSON.stringify({code:'0005', message:'3Username or password did not match'})}, null);
+        return callback({message:JSON.stringify({code:'01020004', error:errors['0004']})}, null);
       }
     });
   });
@@ -90,29 +90,14 @@ account.authenticate = function(call, callback){
 account.recover = function(call, callback){
   pool.getConnection(function(err, connection) {
     if (err) {
-      return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
+      return callback({message:JSON.stringify({code:'01020001', error:errors['0001']})}, null);
     }
     var query = "SELECT _id FROM users WHERE username = '" + call.request.email + "' OR email = '" + call.request.email + "'";
     connection.query(query, function(error, results){
       connection.release();
-      if(err){return callback({message:JSON.stringify({code:'0002', message:'1Username or password did not match'})}, null);}
+      if(err){return callback({message:JSON.stringify({code:'01020003', error:errors['0003']})}, null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
-          //user exists so verify password matches
-          //var result = verifyPassword(results[0]._id, call.request.password, callback);
-          //generate temporary token that links to user account
-          //send email containing unique string
-
-
-
-
-          /*emailClient.send({recipient: 'michael@wildapplications.com', subject:'Test', content:'This is a test email sent from the server'}, function(err, response){
-            if(err){
-              callback(err, null);
-            }
-            console.log(response);
-            return callback(null, response);
-          });*/
           callback({message:'testing storage'}, null);
         }else{
           //no results
@@ -131,38 +116,36 @@ account.resetPassword = function(call, callback){
   //call.verification
   //call.password
   //find the associated verification and user id
-  
+
 }
 
 account.create = function(call, callback){
   pool.getConnection(function(err,connection){
     if(err){
-      return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
+      return callback({message:JSON.stringify({code:'01030001', error:errors['0001']})}, null);
     }
     connection.beginTransaction(function(err){
       if(err){
-        return callback({message:JSON.stringify({code:'0001', message:'Failed to connect to the database'})}, null);
+        return callback({message:JSON.stringify({code:'01040001', error:errors['0001']})}, null);
       }
       var query = "INSERT INTO users (username, email) VALUES ('"+call.request.username+"', '"+call.request.email+"')";
-      console.log(query);
       connection.query(query, function(error, results){
           if(error){
-            console.log(error.sqlMessage);
             connection.rollback(function(){
-              callback({message:JSON.stringify({code:'0014', message:'User already exists'})}, null);
+              callback({message:JSON.stringify({code:'01000005', error:errors['0005']})}, null);
             })
           }else{
-            console.log(results);
             storePassword(results.insertId, call.request.password, connection, function(err, passwordResult){
               if(err){
                 return connection.rollback(function(){
-                  callback({message:JSON.stringify({code:'0004', message:'2Unable to create new user'})}, null);
+                  callback({message:err, null);
                 });
               }else{
                 connection.commit(function(err){
                   if(err){
                     connection.rollback(function(){
-                      return callback({message:JSON.stringify({code:'0004', message:'4Unable to create new user'})}, null);
+                      //need to delete password
+                      return callback({message:JSON.stringify({code:'01000006', error:errors['0006']})}, null);
                     })
                   }else{
                     callback(null, {token: generateToken(passwordResult._id)});
@@ -192,11 +175,11 @@ function verifyPassword(_id, password, callback){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
       }else{
-        return callback({message:JSON.stringify({code:'0005', message:'BUsername or password did not match'})}, null);
+        return callback(err, null);
       }
     });
   }else{
-    return callback({message:JSON.stringify({code:'0011', message:'CUsername and password were not supplied'})}, null);
+    return callback({message:JSON.stringify({code:'01000007', error:errors['0007']})}, null);
   }
 }
 
@@ -220,32 +203,15 @@ function storePassword(_id, password, connection, callback){
           callback(null, res);
           return;
         }else{
-          callback({message:'Unable to store user'},null);
+          return callback(err, null);
         }
       }
     });
   }else{
-    callback({message:'0011 - Account Id or Password were not suppled'}, null);
+    return callback({message:JSON.stringify({code:'01010007', error:errors['0007']})}, null);
   }
 }
 
-function createPremises(_id, callback){
-
-
-  if(_id){
-    var body = {};
-    body.name = "";
-    body.description = "";
-    body.owner = _id;
-    premisesClient.create(body, function(err, result){
-      if(err){
-        return callback({message:'unable to create premises'});
-      }else{
-        return callback(null, result);
-      }
-    });
-  }
-}
 
 
 
