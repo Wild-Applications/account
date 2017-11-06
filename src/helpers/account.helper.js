@@ -62,6 +62,7 @@ account.authenticate = function(call, callback){
     if (err) {
       return callback({message:JSON.stringify({code:'01010001', error:errors['0001']})}, null);
     }
+    console.log(call.request.accountType);
     if(!call.request.accountType == 'CUSTOMER'){
       call.request.client = false;
       call.request.customer = true;
