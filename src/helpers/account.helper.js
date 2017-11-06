@@ -67,7 +67,7 @@ account.authenticate = function(call, callback){
       call.request.customer = true;
     }else{
         call.request.client = true;
-        call.request.customer = true;
+        call.request.customer = false;
     }
     var query = "SELECT _id FROM users WHERE (username = '" + call.request.username + "' OR email = '" + call.request.username + "') AND client = " + call.request.client + " AND customer = " + call.request.customer;
     console.log(query);
