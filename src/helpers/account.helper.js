@@ -69,6 +69,7 @@ account.authenticate = function(call, callback){
       call.request.customer = false;
     }
     var query = "SELECT _id FROM users WHERE (username = '" + call.request.username + "' OR email = '" + call.request.username + "') AND client = " + call.request.client + " AND customer = " + call.request.customer;
+    console.log(query);
     connection.query(query, function(error, results){
       connection.release();
       if(err){return callback({message:JSON.stringify({code:'01000004', error:errors['0004']})}, null);}
