@@ -139,7 +139,7 @@ account.create = function(call, callback){
             storePassword(results.insertId, call.request.password, connection, function(err, passwordResult){
               if(err){
                 return connection.rollback(function(){
-                  callback({message:err, null);
+                  callback({message:err}, null);
                 });
               }else{
                 connection.commit(function(err){
