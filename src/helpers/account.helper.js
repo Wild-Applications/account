@@ -57,6 +57,54 @@ account.getAccount = function(call, callback){
   });
 }
 
+account.checkEmail = function(call, callback){
+  pool.getConnection(function(err, connection) {
+    if (err) {
+      return callback({message:JSON.stringify({code:'01060001', error:errors['0001']})}, null);
+    }
+    var query = "SELECT _id FROM users WHERE email = '" + call.request.email + "'";
+    connection.query(query, function(error, results){
+      connection.release();
+      if(err){return callback({message:JSON.stringify({code:'01030002', error:errors['0004']})}, null);}
+      if(typeof results != 'undefined'){
+        if(results.length != 0){
+          //user exists so verify password matches
+          callback(null, {taken: true});
+        }else{
+          //no results
+          return callback(null, {taken: false});
+        }
+      }else{
+        return callback(null, {taken: false});
+      }
+    });
+  });
+}
+
+account.checkUsername = function(call, callback){
+  pool.getConnection(function(err, connection) {
+    if (err) {
+      return callback({message:JSON.stringify({code:'01060001', error:errors['0001']})}, null);
+    }
+    var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "'";
+    connection.query(query, function(error, results){
+      connection.release();
+      if(err){return callback({message:JSON.stringify({code:'01030002', error:errors['0004']})}, null);}
+      if(typeof results != 'undefined'){
+        if(results.length != 0){
+          //user exists so verify password matches
+          callback(null, {taken: true});
+        }else{
+          //no results
+          return callback(null, {taken: false});
+        }
+      }else{
+        return callback(null, {taken: false});
+      }
+    });
+  });
+}
+
 account.authenticate = function(call, callback){
   pool.getConnection(function(err, connection) {
     if (err) {

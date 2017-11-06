@@ -7,6 +7,8 @@ service AccountService {
   rpc get (Empty) returns (GetReply){}
   rpc create (CreateRequest) returns (CreateReply){}
   rpc authenticate (AuthenticateRequest) returns (TokenReply){}
+  rpc checkUsername (UsernameRequest) returns (UsernameResponse){}
+  rpc checkEmail (EmailRequest) returns (EmailResponse){}
 }
 
 // Message Type definition for user
@@ -37,4 +39,20 @@ message AuthenticateRequest {
 
 message TokenReply {
   string token = 1;
+}
+
+message UsernameRequest {
+  string username = 1;
+}
+
+message UsernameResponse {
+  bool taken = 1;
+}
+
+message EmailRequest {
+  string email = 1;
+}
+
+message EmailResponse {
+  bool taken = 1;
 }
