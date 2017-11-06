@@ -131,7 +131,14 @@ account.create = function(call, callback){
       if(err){
         return callback({message:JSON.stringify({code:'01040001', error:errors['0001']})}, null);
       }
-      var query = "INSERT INTO users (username, email) VALUES ('"+call.request.username+"', '"+call.request.email+"')";
+      if(call.request.accountType == "CLIENT"){
+        call.request.customer = false;
+        call.request.client = true;
+      }else{
+        call.request.customer = true;
+        call.request.client = false;
+      }
+      var query = "INSERT INTO users (username, email, customer, client) VALUES ('"+call.request.username+"', '"+call.request.email+"', "+call.request.customer+", "+call.request.client+")";
       connection.query(query, function(error, results){
           if(error){
             connection.rollback(function(){
