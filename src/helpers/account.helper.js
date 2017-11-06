@@ -62,11 +62,12 @@ account.authenticate = function(call, callback){
     if (err) {
       return callback({message:JSON.stringify({code:'01010001', error:errors['0001']})}, null);
     }
-    if(!call.request.client){
+    if(!call.request.accountType == 'CUSTOMER'){
       call.request.client = false;
-    }
-    if(!call.request.customer){
-      call.request.customer = false;
+      call.request.customer = true;
+    }else{
+        call.request.client = true;
+        call.request.customer = true;
     }
     var query = "SELECT _id FROM users WHERE (username = '" + call.request.username + "' OR email = '" + call.request.username + "') AND client = " + call.request.client + " AND customer = " + call.request.customer;
     console.log(query);

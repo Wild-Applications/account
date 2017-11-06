@@ -31,7 +31,7 @@ spec:
       containers:
       - name: account
         image: wildapplications/account:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 50051
         env:
