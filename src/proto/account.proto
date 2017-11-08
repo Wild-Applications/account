@@ -18,6 +18,7 @@ message Empty {
 message GetReply {
   string username = 1;
   string email = 2;
+  bool verified = 3;
 }
 
 message CreateRequest {
