@@ -86,7 +86,7 @@ account.checkUsername = function(call, callback){
     if (err) {
       return callback({message:JSON.stringify({code:'01060001', error:errors['0001']})}, null);
     }
-    var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "'";]
+    var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "'";
     console.log(query);
     connection.query(query, function(error, results){
       connection.release();
