@@ -207,7 +207,13 @@ account.create = function(call, callback){
                       return callback({message:JSON.stringify({code:'01000006', error:errors['0006']})}, null);
                     })
                   }else{
-                    callback(null, {token: generateToken(passwordResult._id)});
+                    emailClient.send({recipient:"michael@tabap.co.uk", subject:"Testing Email from Service", content:"Fuck me it worked"}, function(err, callback){
+                      if(err){
+                        return callback({message:JSON.stringify(err)}, null);
+                      }else{
+                        callback(null, {token: generateToken(passwordResult._id)});
+                      }
+                    })
                   }
                 })
 
