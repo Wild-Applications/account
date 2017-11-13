@@ -209,6 +209,7 @@ account.create = function(call, callback){
                   }else{
                     emailClient.send({recipient:"michael@tabapp.co.uk", subject:"Testing Email from Service", content:"Fuck me it worked"}, function(err, callback){
                       if(err){
+                        console.log(err);
                         return callback({message:JSON.stringify(err)}, null);
                       }else{
                         callback(null, {token: generateToken(passwordResult._id)});
