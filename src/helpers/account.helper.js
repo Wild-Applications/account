@@ -234,7 +234,7 @@ function verifyPassword(_id, password, callback){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
       }else{
-        return callback(err, null);
+        return callback({message:JSON.stringify({code:'01050004', error:errors['0004']})}, null);
       }
     });
   }else{
