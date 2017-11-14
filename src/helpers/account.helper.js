@@ -229,6 +229,7 @@ function verifyPassword(_id, password, callback){
       if(err){ return callback(err, null);};
       //
       console.log(err);
+      console.log(response.authenticated);
       if(response.authenticated){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
