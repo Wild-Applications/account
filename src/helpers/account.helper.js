@@ -152,6 +152,7 @@ account.recover = function(call, callback){
         if(results.length != 0){
           authenticationClient.requestReset({_id: results[0]._id}, function(err, response){
             if(err){
+              console.log(err);
               return callback(err, null);
             }else{
               return callback(null,{recovery: true});
