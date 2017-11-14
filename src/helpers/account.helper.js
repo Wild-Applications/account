@@ -150,7 +150,13 @@ account.recover = function(call, callback){
       if(err){return callback({message:JSON.stringify({code:'01020003', error:errors['0003']})}, null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
-          callback({message:'testing storage'}, null);
+          authenticationClient.requestReset({_id: results[0]._id}, function(err, response){
+            if(err){
+              return callback(err, null);
+            }else{
+              return callback(null,{recovery: true});
+            }
+          })
         }else{
           //no results
           //in this case we dont want the user to know if an account with that username/email exists

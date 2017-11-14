@@ -6,6 +6,8 @@ package authentication;
 service AuthenticationService {
   rpc authenticateUser (AuthenticationRequest) returns (AuthenticationReply){}
   rpc storeUser (AuthenticationRequest) returns (StorageReply){}
+  rpc updateUser (AuthenticationRequest) returns (StorageReply){}
+  rpc requestReset (ResetRequest) returns (ResetReply){}
 }
 
 // Message Type definition for user
@@ -20,4 +22,12 @@ message AuthenticationReply {
 
 message StorageReply {
   bool stored = 1;
+}
+
+message ResetRequest {
+  int32 _id = 1;
+}
+
+message ResetReply{
+  bool resetSent = 1;
 }

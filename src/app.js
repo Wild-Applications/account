@@ -23,11 +23,11 @@ server.addService(proto.account.AccountService.service, {
   resetPassword: function(call, callback){
     accountHelper.resetPassword(call, callback);
   },
-  checkEmail: function(call, callback){
-    accountHelper.checkEmail(call, callback);
-  },
   checkUsername: function(call, callback){
     accountHelper.checkUsername(call, callback);
+  },
+  recover: function(call, callback){
+    accountHelper.recover(call, callback);
   }
 
 });
