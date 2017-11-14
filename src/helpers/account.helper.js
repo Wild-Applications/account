@@ -103,6 +103,7 @@ account.authenticate = function(call, callback){
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
+          console.log("Verifying passwor");
           var result = verifyPassword(results[0]._id, call.request.password, callback);
         }else{
           //no results
@@ -227,6 +228,7 @@ function verifyPassword(_id, password, callback){
     authenticationClient.authenticateUser(body, function(err,response){
       if(err){ return callback(err, null);};
       //
+      console.log(err);
       if(response.authenticated){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
