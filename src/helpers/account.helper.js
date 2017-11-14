@@ -156,7 +156,7 @@ account.recover = function(call, callback){
 }
 
 account.resetPassword = function(call, callback){
-  authenticationClient.resetPassword({hash: call.request.hash, password: call.request.password}, function(err, result){
+  authenticationClient.resetPassword({guid: call.request.guid, password: call.request.password}, function(err, result){
     console.log(result);
     callback(null, null)
   });
