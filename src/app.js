@@ -29,6 +29,7 @@ server.addService(proto.account.AccountService.service, {
   recover: function(call, callback){
     accountHelper.recover(call, callback);
   }
+  }
 
 });
 
