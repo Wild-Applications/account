@@ -207,13 +207,11 @@ account.create = function(call, callback){
                       return callback({message:JSON.stringify({code:'01000006', error:errors['0006']})}, null);
                     })
                   }else{
-                    emailClient.send({recipient:"michael@tabapp.co.uk", subject:"Testing Email from Service", content:"Fuck me it worked"}, function(err, callback){
+                    emailClient.send({recipient:"michael@tabapp.co.uk", subject:"Testing Email from Service", content:"Fuck me it worked"}, function(err, result){
                       if(err){
                         console.log(err);
-                        return callback({message:JSON.stringify(err)}, null);
-                      }else{
-                        callback(null, {token: generateToken(passwordResult._id)});
                       }
+                      callback(null, {token: generateToken(passwordResult._id)});
                     })
                   }
                 })
