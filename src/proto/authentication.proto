@@ -29,5 +29,5 @@ message ResetRequest {
 }
 
 message ResetReply{
-  bool guid = 1;
+  string guid = 1;
 }
