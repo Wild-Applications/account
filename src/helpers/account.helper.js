@@ -144,7 +144,7 @@ account.recover = function(call, callback){
     if (err) {
       return callback({message:JSON.stringify({code:'01020001', error:errors['0001']})}, null);
     }
-    var query = "SELECT _id FROM users WHERE username = '" + call.request.email + "' OR email = '" + call.request.email + "'";
+    var query = "SELECT _id, email FROM users WHERE username = '" + call.request.email + "' OR email = '" + call.request.email + "'";
     connection.query(query, function(error, results){
       connection.release();
       if(err){return callback({message:JSON.stringify({code:'01020003', error:errors['0003']})}, null);}
@@ -155,7 +155,14 @@ account.recover = function(call, callback){
               console.log(err);
               return callback(err, null);
             }else{
-              return callback(null,{recovery: true});
+              if(response.guid){
+                emailClient.send({recipient: results[0].email, subject: "Password Reset", content:response.guid}, function(err, response){
+                  if(err){
+                    return callback(err, null);
+                  }
+                  return callback(null,{recovery:true});
+                });
+              }
             }
           })
         }else{

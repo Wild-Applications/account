@@ -29,5 +29,5 @@ message ResetRequest {
 }
 
 message ResetReply{
-  bool resetSent = 1;
+  bool guid = 1;
 }
