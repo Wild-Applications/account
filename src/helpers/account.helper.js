@@ -156,6 +156,13 @@ account.recover = function(call, callback){
 }
 
 account.resetPassword = function(call, callback){
+  authenticationClient.resetPassword({hash: call.request.hash, password: call.request.password}, function(err, result){
+    console.log(result);
+    callback(null, null)
+  });
+}
+
+account.updatePassword = function(call, callback){
   //call.verification
   //call.password
   //find the associated verification and user id
