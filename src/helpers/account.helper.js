@@ -155,6 +155,18 @@ account.recover = function(call, callback){
   });
 }
 
+account.resetPassword = function(call, callback){
+  //this shouldnt touch the user database so no need to get a connection object
+  if(call.request.guid && call.request.password){
+    authenticationClient.resetPassword({guid: call.request.guid, password: call.request.password}, function(err, response){
+      if(err){
+        return callback(err, null);
+      }
+      return callback(null, {successfull:response.reset});
+    });
+  }
+}
+
 account.create = function(call, callback){
   pool.getConnection(function(err,connection){
     if(err){

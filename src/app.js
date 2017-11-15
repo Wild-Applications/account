@@ -22,6 +22,9 @@ server.addService(proto.account.AccountService.service, {
   },
   checkUsername: function(call, callback){
     accountHelper.checkUsername(call, callback);
+  },
+  resetPassword: function(call, callback){
+    accountHelper.resetPassword(call, callback);
   }
 });
 

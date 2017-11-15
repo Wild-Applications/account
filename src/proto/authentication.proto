@@ -7,6 +7,7 @@ service AuthenticationService {
   rpc authenticateUser (AuthenticationRequest) returns (AuthenticationReply){}
   rpc storeUser (AuthenticationRequest) returns (StorageReply){}
   rpc requestReset (ResetRequest) returns (ResetReply){}
+  rpc resetPassword (ResetPassword) returns (ResetPasswordResponse){}
 }
 
 // Message Type definition for user
