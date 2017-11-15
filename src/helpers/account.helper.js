@@ -156,6 +156,7 @@ account.recover = function(call, callback){
 }
 
 account.resetPassword = function(call, callback){
+  console.log('getting here')
   //this shouldnt touch the user database so no need to get a connection object
   if(call.request.guid && call.request.password){
     authenticationClient.resetPassword({guid: call.request.guid, password: call.request.password}, function(err, response){
