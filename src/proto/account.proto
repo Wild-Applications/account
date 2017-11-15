@@ -9,7 +9,6 @@ service AccountService {
   rpc authenticate (AuthenticateRequest) returns (TokenReply){}
   rpc checkUsername (UsernameRequest) returns (UsernameResponse){}
   rpc recover (RecoverRequest) returns (RecoverResponse){}
-  rpc resetPassword (ResetRequest) returns (ResetResponse){}
 }
 
 // Message Type definition for user

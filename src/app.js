@@ -20,16 +20,9 @@ server.addService(proto.account.AccountService.service, {
   recover: function(call, callback){
     accountHelper.recover(call, callback);
   },
-  resetPassword: function(call, callback){
-    accountHelper.resetPassword(call, callback);
-  },
   checkUsername: function(call, callback){
     accountHelper.checkUsername(call, callback);
-  },
-  recover: function(call, callback){
-    accountHelper.recover(call, callback);
   }
-
 });
 
 //Specify the IP and and port to start the grpc Server, no SSL in test environment
