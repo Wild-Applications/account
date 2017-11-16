@@ -164,6 +164,7 @@ account.resetPassword = function(call, callback){
         console.log(err);
         return callback(err.error, null);
       }
+      console.log(response);
       return callback(null, {successful:response.reset});
     });
   }
