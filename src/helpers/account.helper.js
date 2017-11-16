@@ -161,10 +161,10 @@ account.resetPassword = function(call, callback){
   if(call.request.guid && call.request.password){
     authenticationClient.resetPassword({guid: call.request.guid, password: call.request.password}, function(err, response){
       if(err){
-        console.log(err);
+        console.log("error", err);
         return callback(err.error, null);
       }
-      console.log(response);
+      console.log("result", response);
       return callback(null, {successful:response.reset});
     });
   }
