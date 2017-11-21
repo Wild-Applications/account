@@ -34,3 +34,10 @@ server.bind('0.0.0.0:50051', grpc.ServerCredentials.createInsecure());
 //Start the server
 server.start();
 console.log('gRPC server running on port: 50051');
+
+process.on('SIGTERM', function onSigterm () {
+  console.info('Got SIGTERM. Graceful shutdown start', new Date().toISOString())
+  server.tryShutdown(()=>{
+    process.exit(1);
+  })
+})
