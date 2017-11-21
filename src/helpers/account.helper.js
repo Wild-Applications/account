@@ -99,7 +99,7 @@ account.authenticate = function(call, callback){
     console.log(query);
     connection.query(query, function(error, results){
       connection.release();
-      if(err){return callback(
+      if(err){
         return callback({name:'01000004', message:errors['0004']}, null);
       }
       if(typeof results != 'undefined'){
