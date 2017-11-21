@@ -66,7 +66,7 @@ account.checkUsername = function(call, callback){
     console.log(query);
     connection.query(query, function(error, results){
       connection.release();
-      if(error){return callback({message:JSON.stringify({code:'01030002', error:errors['0004']})}, null);}
+      if(error){return callback({message:JSON.stringify({name:'01030002', message:errors['0002']})}, null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
@@ -99,7 +99,9 @@ account.authenticate = function(call, callback){
     console.log(query);
     connection.query(query, function(error, results){
       connection.release();
-      if(err){return callback({message:JSON.stringify({code:'01000004', error:errors['0004']})}, null);}
+      if(err){return callback(
+        return callback({name:'01000004', message:errors['0004']}, null);
+      }
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
@@ -107,10 +109,10 @@ account.authenticate = function(call, callback){
           var result = verifyPassword(results[0]._id, call.request.password, callback);
         }else{
           //no results
-          return callback({message:JSON.stringify({code:'01010004', error:errors['0004']})}, null);
+          return callback({name:'01010004', message:errors['0004']}, null);
         }
       }else{
-        return callback({message:JSON.stringify({code:'01020004', error:errors['0004']})}, null);
+        return callback({name:'01020004', message:errors['0004']}, null);
       }
     });
   });
@@ -238,7 +240,7 @@ function verifyPassword(_id, password, callback){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
       }else{
-        return callback({message:JSON.stringify({code:'01050004', error:errors['0004']})}, null);
+        return callback({name:'01050004', message:errors['0004']}, null);
       }
     });
   }else{

@@ -2,7 +2,7 @@
   "0001": {"message": "Failed to connect to the database", "status": 500},
   "0002": {"message": "Failed to get user account from database",  "status": 500},
   "0003": {"message": "User not found", "status": 404},
-  "0004": {"message": "Username or password did not match", "status": 402},
+  "0004": "Username or password did not match",
   "0005": {"message": "User already exists", "status": 403},
   "0006": {"message": "Unable to create new user", "status": 500},
   "0007": {"message": "Username or password were not supplied", "status":400}
