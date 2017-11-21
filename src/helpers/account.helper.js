@@ -240,7 +240,7 @@ function verifyPassword(_id, password, callback){
         console.log('about to gen token');
         callback(null,{token:generateToken(_id)});
       }else{
-        return callback({code: 401, name:'01050004', message:errors['0004'], status:402}, null);
+        return callback({code: 401, status:grpc.status.UNAUTHENTICATED, message:errors['0004'], status:402}, null);
       }
     });
   }else{
