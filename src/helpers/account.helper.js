@@ -12,7 +12,7 @@ var pool = mysql.createPool({
   host            : 'bleuapp.cqvfnrmvten1.us-west-2.rds.amazonaws.com',
   port            : '3306',
   user            : 'bleuadmin',
-  password        : 'Secretbeckyy95',
+  password        : process.env.DB_PASS,
   database        : 'usrdb'
 });
 
@@ -106,7 +106,7 @@ account.authenticate = function(call, callback){
         if(results.length != 0){
           //user exists so verify password matches
           console.log("Verifying passwor");
-          var result = verifyPassword(results[0]._id, call.request.password, callback);
+          var result = verifyPassword(results[0]._id, call.request.password, call.request.accountType, callback);
         }else{
           //no results
           return callback({name:'01010004', message:errors['0004']}, null);
@@ -210,7 +210,7 @@ account.create = function(call, callback){
                       if(err){
                         console.log(err);
                       }
-                      callback(null, {token: generateToken(passwordResult._id)});
+                      callback(null, {token: generateToken(passwordResult._id, call.request.accountType)});
                     })
                   }
                 })
@@ -224,7 +224,7 @@ account.create = function(call, callback){
 }
 
 
-function verifyPassword(_id, password, callback){
+function verifyPassword(_id, password, type,callback){
 
   if( _id && password ){
     //call the authentication service
@@ -238,7 +238,7 @@ function verifyPassword(_id, password, callback){
       console.log(response.authenticated);
       if(response.authenticated){
         console.log('about to gen token');
-        callback(null,{token:generateToken(_id)});
+        callback(null,{token:generateToken(_id, type)});
       }else{
         return callback({code: 401, status:grpc.status.UNAUTHENTICATED, message:errors['0004'], status:402}, null);
       }
@@ -283,13 +283,18 @@ function storePassword(_id, password, connection, callback){
 
 //--------------
 
-function generateToken(_id){
+function generateToken(_id, type){
+  var expiresIn = 60 * 60 * 12;
+  if(type == "CUSTOMER"){
+    //expires in a month
+    expiresIn = expiresIn * 2 * 31;
+  }
   return jwt.sign({
     iss: 'http://app.com/users/',
     sub: _id,
     jti: 1,
     iat: Math.floor(Date.now() / 1000) - 30
-  },process.env.JWT_SECRET, {expiresIn: 60 * 60 * 12});
+  },process.env.JWT_SECRET, {expiresIn: expiresIn});
 }
 
 module.exports = account;

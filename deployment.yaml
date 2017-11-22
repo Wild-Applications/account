@@ -40,6 +40,11 @@ spec:
             secretKeyRef:
               name: jwt-secret
               key: secret
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: db-pass
+              key: secret
         volumeMounts:
         - name: redis-persistent-storage
           mountPath: /data/redis
