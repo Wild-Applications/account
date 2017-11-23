@@ -5,7 +5,7 @@
 var mysql      = require('mysql'),
 jwt            = require('jsonwebtoken'),
 errors         = require('../errors/errors.json');
-
+console.log(process.env.DB_PASS);
 //database config
 var pool = mysql.createPool({
   connectionLimit : 10,

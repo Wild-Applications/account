@@ -44,7 +44,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: db-pass
-              key: secret
+              key: db-pass
         volumeMounts:
         - name: redis-persistent-storage
           mountPath: /data/redis
