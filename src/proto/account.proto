@@ -10,6 +10,7 @@ service AccountService {
   rpc checkUsername (UsernameRequest) returns (UsernameResponse){}
   rpc recover (RecoverRequest) returns (RecoverResponse){}
   rpc resetPassword (ResetRequest) returns (ResetResponse){}
+  rpc changePassword (ChangeRequest) returns (ChangeResponse){}
 }
 
 // Message Type definition for user
@@ -67,4 +68,13 @@ message ResetRequest {
 
 message ResetResponse{
   bool successful = 1;
+}
+
+message ChangeRequest{
+  string original = 1;
+  string new = 2;
+}
+
+message ChangeResponse {
+  
 }

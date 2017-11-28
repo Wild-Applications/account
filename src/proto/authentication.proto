@@ -8,6 +8,7 @@ service AuthenticationService {
   rpc storeUser (AuthenticationRequest) returns (StorageReply){}
   rpc requestReset (ResetRequest) returns (ResetReply){}
   rpc resetPassword (ResetPassword) returns (ResetPasswordResponse){}
+  rpc changePassword (ChangeRequest) returns (ChangeResponse){}
 }
 
 // Message Type definition for user
@@ -39,4 +40,13 @@ message ResetPassword{
 
 message ResetPasswordResponse {
   bool reset = 1;
+}
+
+message ChangeRequest {
+  string original = 1;
+  string new = 2;
+}
+
+message ChangeResponse{
+
 }
