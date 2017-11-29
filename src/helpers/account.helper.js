@@ -175,7 +175,7 @@ account.changePassword = (call, callback) => {
       return callback({message:err},null);
     }
     if(call.request.original && call.request.new){
-      authenticationClient.changePassword({original: call.request.original, new: call.request.new}, (err, result) => {
+      authenticationClient.changePassword({original: call.request.original, new: call.request.new}, call.metadata, (err, result) => {
         if(err){
           return callback(err, null);
         }
