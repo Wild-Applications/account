@@ -8,7 +8,7 @@ errors         = require('../errors/errors.json');
 //database config
 var pool = mysql.createPool({
   connectionLimit : 10,
-  host            : '35.198.164.113',
+  host            : 'wildapps-tab:europe-west3:wildappsuserdb',
   port            : '3306',
   user            : 'backend',
   password        : process.env.DB_PASS,
