@@ -1,10 +1,10 @@
 {
-  "0001": {"message": "Failed to connect to the database", "status": 500},
-  "0002": {"message": "Failed to get user account from database",  "status": 500},
-  "0003": {"message": "User not found", "status": 404},
-  "0004": "Username or password did not match",
-  "0005": {"message": "User already exists", "status": 403},
-  "0006": {"message": "Unable to create new user", "status": 500},
-  "0007": {"message": "Username or password were not supplied", "status":400},
+  "0001": {"message": "Failed to connect to the database", "code": 500},
+  "0002": {"message": "Failed to get user account from database",  "code": 500},
+  "0003": {"message": "User not found", "code": 404},
+  "0004": {"message": "Username or password did not match", "code":401},
+  "0005": {"message": "User already exists", "code": 403},
+  "0006": {"message": "Unable to create new user", "code": 500},
+  "0007": {"message": "Username or password were not supplied", "code":400},
   "0008": {"message": "Required parameters were not supplied", "code": 400}
 }

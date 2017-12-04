@@ -36,20 +36,20 @@ account.getAccount = function(call, callback){
     }
     pool.getConnection(function(err, connection){
       if(err){
-        return callback({message:JSON.stringify({code:'01000001', error:errors['0001']})}, null);
+        return callback(errors['0001'], null);
       }
       var query = "SELECT username, email FROM users where _id = " + token.sub + " LIMIT 1";
       connection.query(query, function(error, results){
         connection.release();
-        if(err){return callback({message:JSON.stringify({code:'01000002', error:errors['0002']})}, null);}
+        if(err){return callback(errors['0002'], null);}
         if(typeof results != 'undefined'){
           if(results.length != 0){
             callback(null, results[0]);
           }else{
-            return callback({message:JSON.stringify({code:'01000003', error:errors['0003']})}, null);
+            return callback(errors['0003'], null);
           }
         }else{
-          return callback({message:JSON.stringify({code:'01010003', error:errors['0003']})}, null);
+          return callback(errors['0003'], null);
         }
       });
     });
@@ -59,13 +59,13 @@ account.getAccount = function(call, callback){
 account.checkUsername = function(call, callback){
   pool.getConnection(function(err, connection) {
     if (err) {
-      return callback({message:JSON.stringify({code:'01060001', error:errors['0001']})}, null);
+      return callback(errors['0001'], null);
     }
     var query = "SELECT _id FROM users WHERE username = '" + call.request.username + "'";
-    console.log(query);
+
     connection.query(query, function(error, results){
       connection.release();
-      if(error){return callback({message:JSON.stringify({name:'01030002', message:errors['0002']})}, null);}
+      if(error){return callback(errors['0002'], null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
@@ -84,9 +84,9 @@ account.checkUsername = function(call, callback){
 account.authenticate = function(call, callback){
   pool.getConnection(function(err, connection) {
     if (err) {
-      return callback({message:JSON.stringify({code:'01010001', error:errors['0001']})}, null);
+      return callback(errors['0001'], null);
     }
-    console.log(call.request.accountType);
+
     if(call.request.accountType == "CUSTOMER"){
       call.request.client = false;
       call.request.customer = true;
@@ -95,23 +95,22 @@ account.authenticate = function(call, callback){
         call.request.customer = false;
     }
     var query = "SELECT _id FROM users WHERE (username = '" + call.request.username + "' OR email = '" + call.request.username + "') AND client = " + call.request.client + " AND customer = " + call.request.customer;
-    console.log(query);
+
     connection.query(query, function(error, results){
       connection.release();
       if(err){
-        return callback({name:'01000004', message:errors['0004']}, null);
+        return callback(errors['0004'], null);
       }
       if(typeof results != 'undefined'){
         if(results.length != 0){
           //user exists so verify password matches
-          console.log("Verifying passwor");
           var result = verifyPassword(results[0]._id, call.request.password, call.request.accountType, callback);
         }else{
           //no results
-          return callback({name:'01010004', message:errors['0004']}, null);
+          return callback(errors['0004'], null);
         }
       }else{
-        return callback({name:'01020004', message:errors['0004']}, null);
+        return callback(errors['0004'], null);
       }
     });
   });
@@ -120,17 +119,16 @@ account.authenticate = function(call, callback){
 account.recover = function(call, callback){
   pool.getConnection(function(err, connection) {
     if (err) {
-      return callback({message:JSON.stringify({code:'01020001', error:errors['0001']})}, null);
+      return callback(errors['0001'], null);
     }
     var query = "SELECT _id, email FROM users WHERE username = '" + call.request.email + "' OR email = '" + call.request.email + "'";
     connection.query(query, function(error, results){
       connection.release();
-      if(err){return callback({message:JSON.stringify({code:'01020003', error:errors['0003']})}, null);}
+      if(err){return callback({message:JSON.stringify(errors['0003'], null);}
       if(typeof results != 'undefined'){
         if(results.length != 0){
           authenticationClient.requestReset({_id: results[0]._id}, function(err, response){
             if(err){
-              console.log(err);
               return callback(err, null);
             }else{
               if(response.guid){
@@ -163,7 +161,6 @@ account.resetPassword = function(call, callback){
       if(err){
         return callback(err, null);
       }
-      console.log("result", response);
       return callback(null, {successful:response.reset});
     });
   }
@@ -190,11 +187,11 @@ account.changePassword = (call, callback) => {
 account.create = function(call, callback){
   pool.getConnection(function(err,connection){
     if(err){
-      return callback({message:JSON.stringify({code:'01030001', error:errors['0001']})}, null);
+      return callback(errors['0001'], null);
     }
     connection.beginTransaction(function(err){
       if(err){
-        return callback({message:JSON.stringify({code:'01040001', error:errors['0001']})}, null);
+        return callback(errors['0001'], null);
       }
       if(call.request.accountType == "CLIENT"){
         call.request.customer = false;
@@ -207,7 +204,7 @@ account.create = function(call, callback){
       connection.query(query, function(error, results){
           if(error){
             connection.rollback(function(){
-              callback({message:JSON.stringify({code:'01000005', error:errors['0005']})}, null);
+              callback(errors['0005'], null);
             })
           }else{
             storePassword(results.insertId, call.request.password, connection, function(err, passwordResult){
@@ -220,7 +217,7 @@ account.create = function(call, callback){
                   if(err){
                     connection.rollback(function(){
                       //need to delete password
-                      return callback({message:JSON.stringify({code:'01000006', error:errors['0006']})}, null);
+                      return callback(errors['0006'], null);
                     })
                   }else{
                     emailClient.send({recipient:"michael@tabapp.co.uk", subject:"Testing Email from Service", content:"Fuck me it worked"}, function(err, result){
@@ -251,17 +248,14 @@ function verifyPassword(_id, password, type,callback){
     authenticationClient.authenticateUser(body, function(err,response){
       if(err){ return callback(err, null);};
       //
-      console.log(err);
-      console.log(response.authenticated);
       if(response.authenticated){
-        console.log('about to gen token');
         callback(null,{token:generateToken(_id, type)});
       }else{
-        return callback({code: 401, status:grpc.status.UNAUTHENTICATED, message:errors['0004'], status:402}, null);
+        return callback(errors['0004'], null);
       }
     });
   }else{
-    return callback({message:JSON.stringify({code:'01000007', error:errors['0007']})}, null);
+    return callback(errors['0007'], null);
   }
 }
 
@@ -290,7 +284,7 @@ function storePassword(_id, password, connection, callback){
       }
     });
   }else{
-    return callback({message:JSON.stringify({code:'01010007', error:errors['0007']})}, null);
+    return callback(errors['0007'], null);
   }
 }
 
@@ -307,7 +301,7 @@ function generateToken(_id, type){
     expiresIn = expiresIn * 2 * 31;
   }
   return jwt.sign({
-    iss: 'http://app.com/users/',
+    iss: 'https://tabapp.co.uk',
     sub: _id,
     jti: 1,
     iat: Math.floor(Date.now() / 1000) - 30
