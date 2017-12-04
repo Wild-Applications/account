@@ -45,9 +45,6 @@ spec:
             secretKeyRef:
               name: db-pass
               key: db-pass
-        volumeMounts:
-        - name: redis-persistent-storage
-          mountPath: /data/redis
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
         command: ["/cloud_sql_proxy", "--dir=/cloudsql",
