@@ -124,7 +124,7 @@ account.recover = function(call, callback){
     var query = "SELECT _id, email FROM users WHERE username = '" + call.request.email + "' OR email = '" + call.request.email + "'";
     connection.query(query, function(error, results){
       connection.release();
-      if(err){return callback({message:JSON.stringify(errors['0003'], null);}
+      if(err){return callback(errors['0003'], null);
       if(typeof results != 'undefined'){
         if(results.length != 0){
           authenticationClient.requestReset({_id: results[0]._id}, function(err, response){
