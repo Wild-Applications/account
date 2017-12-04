@@ -309,3 +309,4 @@ function generateToken(_id, type){
 }
 
 module.exports = account;
+//
