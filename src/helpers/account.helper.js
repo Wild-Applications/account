@@ -8,9 +8,9 @@ errors         = require('../errors/errors.json');
 //database config
 var pool = mysql.createPool({
   connectionLimit : 10,
-  host            : 'bleuapp.cqvfnrmvten1.us-west-2.rds.amazonaws.com',
+  host            : '35.198.164.113',
   port            : '3306',
-  user            : 'bleuadmin',
+  user            : 'backend',
   password        : process.env.DB_PASS,
   database        : 'usrdb'
 });
