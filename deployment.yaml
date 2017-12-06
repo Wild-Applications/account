@@ -45,6 +45,7 @@ spec:
             secretKeyRef:
               name: db-pass
               key: db-pass
+      # [START proxy_container]
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
         command: ["/cloud_sql_proxy", "--dir=/cloudsql",
@@ -58,17 +59,18 @@ spec:
             mountPath: /etc/ssl/certs
           - name: cloudsql
             mountPath: /cloudsql
+      # [END proxy_container]
+      # [START volumes]
       volumes:
-      - name: redis-persistent-storage
-        emptyDir: {}
-      - name: cloudsql-instance-credentials
-        secret:
-          secretName: cloudsql-instance-credentials
-      - name: cloudsql
-        emptyDir:
-      - name: ssl-certs
-        hostPath:
-          path: /etc/ssl/certs
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+        - name: cloudsql
+          emptyDir:
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs
+      # [END volumes]
 ---
 apiVersion: v1
 kind: Service

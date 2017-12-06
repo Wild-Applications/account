@@ -84,6 +84,7 @@ account.checkUsername = function(call, callback){
 account.authenticate = function(call, callback){
   pool.getConnection(function(err, connection) {
     if (err) {
+      console.log(err);
       return callback(errors['0001'], null);
     }
 
