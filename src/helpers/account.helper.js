@@ -10,7 +10,7 @@ var pool = mysql.createPool({
   connectionLimit : 10,
   host            : '127.0.0.1',
   port            : '3306',
-  user            : 'backend',
+  user            : 'proxyuser',
   password        : process.env.DB_PASS,
   database        : 'usrdb'
 });
