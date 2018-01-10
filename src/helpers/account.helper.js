@@ -221,12 +221,27 @@ account.create = function(call, callback){
                       return callback(errors['0006'], null);
                     })
                   }else{
-                    emailClient.send({recipient:"michael@tabapp.co.uk", subject:"Testing Email from Service", content:"Fuck me it worked"}, function(err, result){
+
+                    emailClient.send({recipient:call.request.email, subject:"Welcome to Tab!", content:"Thanks for signing up."}, function(err, result){
                       if(err){
                         console.log(err);
                       }
+                    });
+
+                    if(call.request.client){
+                      var premisesToCreate = {};
+                      premisesToCreate.owner = decodedToken.sub;
+                      premisesToCreate.name = call.request.username;
+                      premisesClient.create(premisesToCreate, function(err, result){
+                        if(err){
+                          //dont worry, users can upsert later on
+                          console.log(err);
+                        }
+                        callback(null, {token: generateToken(passwordResult._id, call.request.accountType)});
+                      });
+                    }else{
                       callback(null, {token: generateToken(passwordResult._id, call.request.accountType)});
-                    })
+                    }
                   }
                 })
 
