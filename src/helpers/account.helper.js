@@ -190,66 +190,75 @@ account.create = function(call, callback){
     if(err){
       return callback(errors['0001'], null);
     }
-    connection.beginTransaction(function(err){
-      if(err){
-        return callback(errors['0001'], null);
-      }
-      if(call.request.accountType == "CLIENT"){
-        call.request.customer = false;
-        call.request.client = true;
-      }else{
-        call.request.customer = true;
-        call.request.client = false;
-      }
-      var query = "INSERT INTO users (username, email, customer, client) VALUES ('"+call.request.username+"', '"+call.request.email+"', "+call.request.customer+", "+call.request.client+")";
-      connection.query(query, function(error, results){
-          if(error){
-            connection.rollback(function(){
-              callback(errors['0005'], null);
-            })
-          }else{
-            storePassword(results.insertId, call.request.password, connection, function(err, passwordResult){
-              if(err){
-                return connection.rollback(function(){
-                  callback({message:err}, null);
-                });
-              }else{
-                connection.commit(function(err){
-                  if(err){
-                    connection.rollback(function(){
-                      //need to delete password
-                      return callback(errors['0006'], null);
-                    })
-                  }else{
 
-                    emailClient.send({recipient:call.request.email, subject:"Welcome to Tab!", content:"Thanks for signing up."}, function(err, result){
-                      if(err){
-                        console.log(err);
-                      }
-                    });
+    var pattern =/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    var validEmail = pattern.test(call.request.email);
 
-                    if(call.request.client){
-                      var premisesToCreate = {};
-                      premisesToCreate.owner = decodedToken.sub;
-                      premisesToCreate.name = call.request.username;
-                      premisesClient.create(premisesToCreate, function(err, result){
+    if(call.request.username != "" && call.request.email != "" && call.request.password != "" && validEmail){
+      connection.beginTransaction(function(err){
+        if(err){
+          return callback(errors['0001'], null);
+        }
+        if(call.request.accountType == "CLIENT"){
+          call.request.customer = false;
+          call.request.client = true;
+        }else{
+          call.request.customer = true;
+          call.request.client = false;
+        }
+        var query = "INSERT INTO users (username, email, customer, client) VALUES ('"+call.request.username+"', '"+call.request.email+"', "+call.request.customer+", "+call.request.client+")";
+        connection.query(query, function(error, results){
+            if(error){
+              connection.rollback(function(){
+                callback(errors['0005'], null);
+              })
+            }else{
+              storePassword(results.insertId, call.request.password, connection, function(err, passwordResult){
+                if(err){
+                  return connection.rollback(function(){
+                    callback({message:err}, null);
+                  });
+                }else{
+                  connection.commit(function(err){
+                    if(err){
+                      connection.rollback(function(){
+                        //need to delete password
+                        return callback(errors['0006'], null);
+                      })
+                    }else{
+
+                      emailClient.send({recipient:call.request.email, subject:"Welcome to Tab!", content:"Thanks for signing up."}, function(err, result){
                         if(err){
-                          //dont worry, users can upsert later on
                           console.log(err);
                         }
-                        callback(null, {token: generateToken(passwordResult._id, call.request.accountType)});
                       });
-                    }else{
-                      callback(null, {token: generateToken(passwordResult._id, call.request.accountType)});
-                    }
-                  }
-                })
 
-              }
-            });
-          }
+                      if(call.request.client){
+                        var premisesToCreate = {};
+                        premisesToCreate.owner = decodedToken.sub;
+                        premisesToCreate.name = call.request.username;
+                        premisesClient.create(premisesToCreate, function(err, result){
+                          if(err){
+                            //dont worry, users can upsert later on
+                            console.log(err);
+                          }
+                          callback(null, {token: generateToken(passwordResult._id, call.request.accountType)});
+                        });
+                      }else{
+                        callback(null, {token: generateToken(passwordResult._id, call.request.accountType)});
+                      }
+                    }
+                  })
+
+                }
+              });
+            }
+        });
       });
-    });
+    }else{
+      return callback(errors['0009'], null);
+    }
+
   });
 }
 

@@ -6,5 +6,6 @@
   "0005": {"message": "User already exists", "code": 403},
   "0006": {"message": "Unable to create new user", "code": 500},
   "0007": {"message": "Username or password were not supplied", "code":400},
-  "0008": {"message": "Required parameters were not supplied", "code": 400}
+  "0008": {"message": "Required parameters were not supplied", "code": 400},
+  "0009": {"message": "Some parameters are invalid", "code": 400}
 }
